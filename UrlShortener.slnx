@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Aspire/">
+    <Project Path="UrlShortener.AppHost/UrlShortener.AppHost.csproj" />
+    <Project Path="UrlShortener.ServiceDefaults/UrlShortener.ServiceDefaults.csproj" />
+  </Folder>
+  <Project Path="UrlShortener.AF/UrlShortener.AF.csproj" />
+  <Project Path="UrlShortener.Api/UrlShortener.Api.csproj" />
+  <Project Path="UrlShortener.Business/UrlShortener.Business.csproj" Id="a57b5d59-46a2-4efa-a4c0-5348bbfc731e" />
+  <Project Path="UrlShortener.Common/UrlShortener.Common.csproj" />
+  <Project Path="UrlShortener.Data.Sql/UrlShortener.Data.Sql.csproj" Id="e51d00a5-0b5b-40ff-9a9a-cb151881789d" />
+</Solution>
