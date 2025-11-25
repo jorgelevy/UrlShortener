@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using UrlShortener.Common.Helpers;
 
 namespace UrlShortener.AF.Functions;
 
@@ -23,7 +24,7 @@ public class RedirectUrl
     [Function("RedirectUrl")]
     public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "{code}")] HttpRequest req, string code)
     {
-        var clientIp = GetClientIp(req);
+        var clientIp = HttpRequestHelper.GetClientIp(req);
         _logger.LogInformation("Redirect request for code {Code} from IP {ClientIp}", code, clientIp);
 
         if (UrlStore.TryGetValue(code, out var originalUrl))
@@ -31,27 +32,5 @@ public class RedirectUrl
             return new RedirectResult(originalUrl);
         }
         return new NotFoundObjectResult("Short URL not found.");
-
-    }
-
-    // Gets the client IP address. Checks common proxy headers first (X-Forwarded-For, X-Real-IP),
-    // then falls back to the connection remote IP.
-    private static string GetClientIp(HttpRequest req)
-    {
-        if (req.Headers.TryGetValue("X-Forwarded-For", out var xff) && !string.IsNullOrWhiteSpace(xff))
-        {
-            // X-Forwarded-For may contain a comma-separated list of IPs; use the first one
-            var first = xff.ToString().Split(',').Select(s => s.Trim()).FirstOrDefault();
-            if (!string.IsNullOrEmpty(first))
-                return first;
-        }
-
-        if (req.Headers.TryGetValue("X-Real-IP", out var xr) && !string.IsNullOrWhiteSpace(xr))
-        {
-            return xr.ToString();
-        }
-
-        var ip = req.HttpContext?.Connection?.RemoteIpAddress?.ToString();
-        return ip ?? "Unknown";
     }
 }
