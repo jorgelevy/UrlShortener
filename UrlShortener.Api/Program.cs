@@ -1,3 +1,4 @@
+using UrlShortener.Api.Endpoints;
 using UrlShortener.Common.Helpers;
 
 var urlStore = new Dictionary<string, string>
@@ -21,30 +22,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/shorten/{url}", (HttpContext context, string url) =>
-{
-    if (string.IsNullOrWhiteSpace(url))
-        return Results.BadRequest("URL is required");
-
-    var shortCode = Guid.NewGuid().ToString().Substring(0, 6);
-    urlStore[shortCode] = url;
-
-    return Results.Ok(new { shortUrl = $"{context.Request.Scheme}://{context.Request.Host}/{shortCode}" });
-});
-
-app.MapPost("/shorten", async (HttpContext context) =>
-{
-    var form = await context.Request.ReadFormAsync();
-    var originalUrl = form["url"].ToString();
-
-    if (string.IsNullOrWhiteSpace(originalUrl))
-        return Results.BadRequest("URL is required");
-
-    var shortCode = Guid.NewGuid().ToString().Substring(0, 6);
-    urlStore[shortCode] = originalUrl;
-
-    return Results.Ok(new { shortUrl = $"{context.Request.Scheme}://{context.Request.Host}/{shortCode}" });
-});
+app.MapShortenEndpoints();
 
 // Redirect endpoint
 app.MapGet("/{code}", (HttpContext context, string code) =>
